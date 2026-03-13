@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramazan Otomatik Sayaç</title>
+    <style>
+        :root {
+            --gold: #f59e0b;
+            --dark: #020617;
+        }
+
+        body {
+            margin: 0;
+            background: var(--dark);
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100vw;
+            height: calc(100vw * 16 / 9);
+            max-width: 430px;
+            max-height: 765px;
+            background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            border: 1px solid #1e293b;
+            border-radius: 20px;
+        }
+
+        #liveClock {
+            font-size: 2.2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 5px;
+        }
+
+        #fullDate {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select {
+            width: 80%;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid var(--gold);
+            font-size: 1.1rem;
+            outline: none;
+            margin-bottom: 30px;
+        }
+
+        .iftar-info {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .iftar-info strong {
+            font-size: 3rem;
+            color: white;
+            display: block;
+        }
+
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .timer-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px 5px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timer-item div:first-child {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .timer-item div:last-child {
+            font-size: 0.7rem;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .date-display {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+
+        /* İlerleme Çubuğu */
+        .progress-container {
+            width: 100%;
+            height: 30px; /* Daha kalın */
+            background: #ef4444; /* Kırmızı (Kalan) */
+            border-radius: 15px;
+            margin: 30px 0;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #22c55e; /* Yeşil (Tamamlanan) */
+            transition: width 1s linear;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+            white-space: nowrap;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Sahur Modu - Gece Teması */
+        .sahur-mode .container {
+            background: linear-gradient(180deg, #1e1b4b 0%, #020617 100%);
+            border-color: #312e81;
+        }
+        
+        .sahur-mode #iftarTimeDisplay {
+            color: #818cf8;
+            text-shadow: 0 0 15px rgba(129, 140, 248, 0.4);
+        }
+
+        #iftarTimeDisplay {
+            transition: color 0.5s ease, text-shadow 0.5s ease;
+        }
+
+        /* Bayram Mesajı Stili */
+        #bayramMessage {
+            display: none;
+            text-align: center;
+            margin-top: 50px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        #bayramMessage h2 {
+            font-size: 3.5rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+
+        #bayramMessage p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div id="liveClock">00:00:00</div>
+        <div id="fullDate">-- Mart 2026, Cuma</div>
+
+        <select id="citySelect" onchange="calculate()">
+            <option value="istanbul">İstanbul</option>
+            <option value="ankara">Ankara</option>
+            <option value="izmir">İzmir</option>
+            <option value="bursa">Bursa</option>
+        </select>
+
+        <div id="mainContent">
+            <div class="iftar-info">
+                <span id="dateLabel">Bugün</span>
+                <span id="vakitLabel" style="opacity:0.6; display:block;">İFTAR VAKTİ</span>
+                <strong id="iftarTimeDisplay">--:--</strong>
+            </div>
+
+            <div class="timer-grid">
+                <div class="timer-item">
+                    <div id="h">00</div>
+                    <div>Saat</div>
+                </div>
+                <div class="timer-item">
+                    <div id="m">00</div>
+                    <div>Dakika</div>
+                </div>
+                <div class="timer-item">
+                    <div id="s">00</div>
+                    <div>Saniye</div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="bayramMessage">
+            <h2>Hayırlı Bayramlar</h2>
+            <p>Ramazan Bayramınız Mübarek Olsun!</p>
+        </div>
+
+        <div class="date-display" id="currentDateDisplay">-- Mart 2026</div>
+    </div>
+
+    <script>
+        // 2026 Mart ayı (Ramazan) için örnek vakitler
+        const vakitler = {
+            istanbul: [
+                { im: "06:12", if: "19:02" }, { im: "06:10", if: "19:03" }, { im: "06:08", if: "19:04" },
+                { im: "06:06", if: "19:05" }, { im: "06:04", if: "19:07" }, { im: "06:02", if: "19:08" },
+                { im: "06:00", if: "19:09" }, { im: "05:58", if: "19:10" }, { im: "05:56", if: "19:11" },
+                { im: "05:54", if: "19:12" }, { im: "05:52", if: "19:13" }, { im: "05:50", if: "19:14" },
+                { im: "05:48", if: "19:15" }, { im: "05:46", if: "19:16" }, { im: "05:45", if: "19:17" },
+                { im: "05:43", if: "19:18" }, { im: "05:41", if: "19:19" }, { im: "05:39", if: "19:20" },
+                { im: "05:37", if: "19:21" }, { im: "05:35", if: "19:22" }
+            ],
+            ankara: [
+                { im: "05:55", if: "18:55" }, { im: "05:54", if: "18:56" }, { im: "05:53", if: "18:57" },
+                { im: "05:52", if: "18:58" }, { im: "05:51", if: "18:59" }, { im: "05:50", if: "19:00" },
+                { im: "05:49", if: "19:01" }, { im: "05:48", if: "19:02" }, { im: "05:47", if: "19:03" },
+                { im: "05:46", if: "19:04" }, { im: "05:45", if: "19:05" }, { im: "05:44", if: "19:06" },
+                { im: "05:43", if: "19:07" }, { im: "05:42", if: "19:08" }, { im: "05:41", if: "19:09" }
+            ],
+            izmir: [
+                { im: "06:18", if: "19:18" }, { im: "06:17", if: "19:19" }, { im: "06:16", if: "19:20" },
+                { im: "06:15", if: "19:21" }, { im: "06:14", if: "19:22" }, { im: "06:13", if: "19:23" },
+                { im: "06:12", if: "19:24" }, { im: "06:11", if: "19:25" }, { im: "06:10", if: "19:26" },
+                { im: "06:09", if: "19:27" }, { im: "06:08", if: "19:28" }, { im: "06:07", if: "19:29" },
+                { im: "06:06", if: "19:30" }, { im: "06:05", if: "19:31" }, { im: "06:04", if: "19:32" }
+            ],
+            bursa: [
+                { im: "06:11", if: "19:11" }, { im: "06:10", if: "19:12" }, { im: "06:09", if: "19:13" },
+                { im: "06:08", if: "19:14" }, { im: "06:07", if: "19:15" }, { im: "06:06", if: "19:16" },
+                { im: "06:05", if: "19:17" }, { im: "06:04", if: "19:18" }, { im: "06:03", if: "19:19" },
+                { im: "06:02", if: "19:20" }, { im: "06:01", if: "19:21" }, { im: "06:00", if: "19:22" },
+                { im: "05:59", if: "19:23" }, { im: "05:58", if: "19:24" }, { im: "05:57", if: "19:25" }
+            ]
+        };
+
+        function calculate() {
+            const now = new Date();
+            const dayOfMonth = now.getDate();
+            const city = document.getElementById('citySelect').value;
+
+            let index = dayOfMonth - 1;
+            if (index < 0) index = 0;
+
+            const bugunVakit = vakitler[city][index] || vakitler[city][vakitler[city].length - 1];
+            const yarinVakit = vakitler[city][index + 1] || bugunVakit;
+            const dunVakit = vakitler[city][index - 1] || bugunVakit;
+
+            document.getElementById('liveClock').innerText = now.toLocaleTimeString('tr-TR');
+            
+            // Tarih ve Gün Formatlama
+            const options = { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' };
+            document.getElementById('fullDate').innerText = now.toLocaleDateString('tr-TR', options);
+            
+            document.getElementById('currentDateDisplay').innerText = dayOfMonth + " Mart 2026";
+
+            const imsakTarget = new Date(now);
+            const [imH, imM] = bugunVakit.im.split(':');
+            imsakTarget.setHours(parseInt(imH), parseInt(imM), 0);
+
+            const iftarTarget = new Date(now);
+            const [ifH, ifM] = bugunVakit.if.split(':');
+            iftarTarget.setHours(parseInt(ifH), parseInt(ifM), 0);
+
+            let target, startTime;
+            let isSahur = false;
+
+            if (now < imsakTarget) {
+                // Sahura kadar (Dün iftardan bugün imsaka)
+                target = imsakTarget;
+                isSahur = true;
+                
+                startTime = new Date(now);
+                startTime.setDate(startTime.getDate() - 1);
+                const [difH, difM] = dunVakit.if.split(':');
+                startTime.setHours(parseInt(difH), parseInt(difM), 0);
+
+                document.getElementById('dateLabel').innerText = "Bugün";
+                document.getElementById('vakitLabel').innerText = "İMSAK VAKTİ (SAHUR)";
+                document.getElementById('iftarTimeDisplay').innerText = bugunVakit.im;
+            } else if (now < iftarTarget) {
+                // İftara kadar (Bugün imsaktan bugün iftara)
+                target = iftarTarget;
+                isSahur = false;
+                startTime = imsakTarget;
+
+                document.getElementById('dateLabel').innerText = "Bugün";
+                document.getElementById('vakitLabel').innerText = "İFTAR VAKTİ";
+                document.getElementById('iftarTimeDisplay').innerText = bugunVakit.if;
+            } else {
+                // İftar geçti, yarına imsak say (Bugün iftardan yarın imsaka)
+                target = new Date(now);
+                target.setDate(target.getDate() + 1);
+                const [nimH, nimM] = yarinVakit.im.split(':');
+                target.setHours(parseInt(nimH), parseInt(nimM), 0);
+                isSahur = true;
+                startTime = iftarTarget;
+
+                document.getElementById('dateLabel').innerText = "Yarın";
+                document.getElementById('vakitLabel').innerText = "İMSAK VAKTİ (SAHUR)";
+                document.getElementById('iftarTimeDisplay').innerText = yarinVakit.im;
+            }
+
+            if (isSahur) {
+                document.body.classList.add('sahur-mode');
+            } else {
+                document.body.classList.remove('sahur-mode');
+            }
+
+            // İlerleme hesaplama
+            const totalDuration = target - startTime;
+            const elapsed = now - startTime;
+            let percent = (elapsed / totalDuration) * 100;
+            percent = Math.max(0, Math.min(100, percent));
+            
+            const bar = document.getElementById('progressBar');
+            bar.style.width = percent + "%";
+            
+            const elapsedH = Math.floor(elapsed / (1000 * 60 * 60));
+            const elapsedM = Math.floor((elapsed / (1000 * 60)) % 60);
+            
+            // Eğer bar çok darsa yazı yazma
+            if (percent > 15) {
+                bar.innerText = `${elapsedH} Saat ${elapsedM} Dakika geçti`;
+            } else {
+                bar.innerText = "";
+            }
+
+            const diff = target - now;
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+
+            document.getElementById('h').innerText = h.toString().padStart(2, '0');
+            document.getElementById('m').innerText = m.toString().padStart(2, '0');
+            document.getElementById('s').innerText = s.toString().padStart(2, '0');
+        }
+
+        setInterval(calculate, 1000);
+        calculate();
+    </script>
+</body>
+
+</html>
