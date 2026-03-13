@@ -38,8 +38,7 @@
         @media (min-width: 450px) {
             .container {
                 max-width: 430px;
-                min-height: auto;
-                height: 850px;
+                min-height: 850px;
                 border: 1px solid #1e293b;
                 border-radius: 30px;
                 margin: 20px;
@@ -47,7 +46,7 @@
         }
 
         #liveClock {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             letter-spacing: 2px;
             color: var(--gold);
@@ -55,7 +54,7 @@
         }
 
         #fullDate {
-            font-size: 0.9rem;
+            font-size: 1rem;
             opacity: 0.7;
             margin-bottom: 25px;
             text-transform: uppercase;
@@ -63,31 +62,30 @@
         }
 
         select {
-            width: 80%;
-            padding: 12px;
+            width: 90%;
+            padding: 15px;
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
             border: 1px solid var(--gold);
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             outline: none;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             cursor: pointer;
         }
 
         select option {
             background: #0f172a;
-            /* Koyu arka plan (Lacivert/Siyah) */
             color: white;
         }
 
         .iftar-info {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
 
         .iftar-info strong {
-            font-size: 3rem;
+            font-size: 4rem;
             color: white;
             display: block;
         }
@@ -97,18 +95,19 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             width: 100%;
+            max-width: 400px;
         }
 
         .timer-item {
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px 5px;
+            padding: 25px 5px;
             border-radius: 15px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .timer-item div:first-child {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--gold);
             text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
@@ -116,22 +115,22 @@
         }
 
         .timer-item div:last-child {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             opacity: 0.5;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .date-display {
-            margin-top: 20px;
-            font-size: 0.9rem;
+            margin-top: 30px;
+            font-size: 1rem;
             opacity: 0.6;
         }
 
         .footer {
             margin-top: auto;
-            padding-top: 20px;
-            font-size: 0.8rem;
+            padding-top: 30px;
+            font-size: 0.9rem;
             opacity: 0.5;
             letter-spacing: 1px;
         }
@@ -148,13 +147,12 @@
 
         /* İlerleme Çubuğu */
         .progress-container {
-            width: 180%;
-            /* %80 artırıldı (100% -> 180%) */
-            height: 54px;
+            width: 100%;
+            max-width: 400px;
+            height: 60px;
             background: #ef4444;
-            border-radius: 27px;
-            margin: 30px -40%;
-            /* Taşmayı ortalamak için */
+            border-radius: 30px;
+            margin: 40px 0;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
@@ -239,6 +237,7 @@
             <option value="ankara">Ankara</option>
             <option value="izmir">İzmir</option>
             <option value="bursa">Bursa</option>
+            <option value="londra">Londra</option>
         </select>
 
         <div id="mainContent">
@@ -312,6 +311,15 @@
                 { im: "06:05", if: "19:17" }, { im: "06:04", if: "19:18" }, { im: "06:03", if: "19:19" },
                 { im: "06:02", if: "19:20" }, { im: "06:01", if: "19:21" }, { im: "06:00", if: "19:22" },
                 { im: "05:59", if: "19:23" }, { im: "05:58", if: "19:24" }, { im: "05:57", if: "19:25" }
+            ],
+            londra: [
+                { im: "05:06", if: "17:44" }, { im: "05:04", if: "17:46" }, { im: "05:02", if: "17:47" },
+                { im: "04:59", if: "17:49" }, { im: "04:57", if: "17:51" }, { im: "04:55", if: "17:53" },
+                { im: "04:53", if: "17:54" }, { im: "04:51", if: "17:56" }, { im: "04:47", if: "17:56" },
+                { im: "04:46", if: "17:59" }, { im: "04:44", if: "18:01" }, { im: "04:42", if: "18:03" },
+                { im: "04:39", if: "18:04" }, { im: "04:37", if: "18:06" }, { im: "04:35", if: "18:07" },
+                { im: "04:33", if: "18:09" }, { im: "04:30", if: "18:11" }, { im: "04:28", if: "18:12" },
+                { im: "04:26", if: "18:14" }, { im: "04:24", if: "18:16" }
             ]
         };
 
@@ -408,24 +416,20 @@
             const elapsed = now - startTime;
             let percent = (elapsed / totalDuration) * 100;
             percent = Math.max(0, Math.min(100, percent));
-
             const bar = document.getElementById('progressBar');
             bar.style.width = percent + "%";
-
-            const elapsedH = Math.floor(elapsed / (1000 * 60 * 60));
-            const elapsedM = Math.floor((elapsed / (1000 * 60)) % 60);
-
-            // Eğer bar çok darsa yazı yazma
-            if (percent > 15) {
-                bar.innerText = `${elapsedH} Saat ${elapsedM} Dakika geçti`;
-            } else {
-                bar.innerText = "";
-            }
 
             const diff = target - now;
             const h = Math.floor(diff / (1000 * 60 * 60));
             const m = Math.floor((diff / (1000 * 60)) % 60);
             const s = Math.floor((diff / 1000) % 60);
+
+            // Eğer bar çok darsa yazı yazma
+            if (percent > 15) {
+                bar.innerText = `${h} Saat ${m} Dakika kaldı`;
+            } else {
+                bar.innerText = "";
+            }
 
             document.getElementById('h').innerText = h.toString().padStart(2, '0');
             document.getElementById('m').innerText = m.toString().padStart(2, '0');
