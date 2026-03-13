@@ -26,7 +26,8 @@
         .container {
             width: 100%;
             min-height: 100vh;
-            background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 0.9) 100%), url('bg.jpeg') no-repeat center center;
+            background-size: cover;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -212,6 +213,32 @@
             color: white;
         }
 
+        /* Hadis Kutusu */
+        .hadis-container {
+            background: rgba(245, 158, 11, 0.05);
+            border-left: 3px solid var(--gold);
+            padding: 15px 20px;
+            margin: 0 0 40px 0;
+            border-radius: 0 15px 15px 0;
+            text-align: center;
+            max-width: 90%;
+            font-style: italic;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .hadis-text {
+            font-size: 0.9rem;
+            color: #f8fafc;
+            line-height: 1.5;
+            margin-bottom: 5px;
+        }
+
+        .hadis-source {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            display: block;
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -245,6 +272,11 @@
                 <span id="dateLabel">Bugün</span>
                 <span id="vakitLabel" style="opacity:0.6; display:block;">İFTAR VAKTİ</span>
                 <strong id="iftarTimeDisplay">--:--</strong>
+            </div>
+
+            <div class="hadis-container" id="hadisContainer">
+                <span class="hadis-text" id="hadisText">...</span>
+                <span class="hadis-source" id="hadisSource">...</span>
             </div>
 
             <div class="timer-grid">
@@ -328,6 +360,27 @@
                 { im: "04:13", if: "18:17" }
             ]
         };
+
+        const hadisler = [
+            { text: "Bütün semâvî kitâbların anahtarı, Besmele-i Şerîfe’dir.", source: "Câmi’u’s-sağîr" },
+            { text: "Cenâb-ı Hakk’ın ni’metlerine şükür, o ni’metin zevâline (yok olmasına) emândır.", source: "Deylemî" },
+            { text: "Sizden bana en yakın olan kimse, bana çokça salevât getirendir.", source: "Câmi’u’s-sağîr" },
+            { text: "Cenâb-ı Allah amelsiz îmânı ve îmânsız da ameli kabûl buyurmaz.", source: "Menâvî" },
+            { text: "Ameller niyetlere göredir.", source: "Menâvi" },
+            { text: "Kişi sevdiği ile beraberdir.", source: "Buhârî, Müslim" },
+            { text: "Âhiret saâdeti için çalışanlara Cenâb-ı Hakk dünya saâdetini de ihsân buyurur.", source: "Deylemî" },
+            { text: "Cenâb-ı Hakk’ın rızâsını kazanmak için beslenen güzel niyet, sâhibini cennete dâhil eder.", source: "Deylemî" },
+            { text: "İbâdetini riyâ (gösteriş), garaz (bozuk niyet) ve ivazdan (karşılık beklemekten) hâlis et (temizle). Bu halde az bir amel senin için kâfîdir (yeterlidir).", source: "Münâvî" },
+            { text: "Lisan ile kalb bir olmadıkça hiçbir kul, mü’min-i kâmil olmaz.", source: "Kenzü’l İrfân" }
+        ];
+
+        function setHadis() {
+            const index = Math.floor(Math.random() * hadisler.length);
+            document.getElementById('hadisText').innerText = `“${hadisler[index].text}”`;
+            document.getElementById('hadisSource').innerText = `(${hadisler[index].source})`;
+        }
+
+        setHadis();
 
         function calculate() {
             const now = new Date();
