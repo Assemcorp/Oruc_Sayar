@@ -21,6 +21,10 @@
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
+            user-select: none; /* Metin seçimini engeller */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .container {
@@ -371,13 +375,44 @@
             { text: "Âhiret saâdeti için çalışanlara Cenâb-ı Hakk dünya saâdetini de ihsân buyurur.", source: "Deylemî" },
             { text: "Cenâb-ı Hakk’ın rızâsını kazanmak için beslenen güzel niyet, sâhibini cennete dâhil eder.", source: "Deylemî" },
             { text: "İbâdetini riyâ (gösteriş), garaz (bozuk niyet) ve ivazdan (karşılık beklemekten) hâlis et (temizle). Bu halde az bir amel senin için kâfîdir (yeterlidir).", source: "Münâvî" },
-            { text: "Lisan ile kalb bir olmadıkça hiçbir kul, mü’min-i kâmil olmaz.", source: "Kenzü’l İrfân" }
+            { text: "Lisan ile kalb bir olmadıkça hiçbir kul, mü’min-i kâmil olmaz.", source: "Kenzü’l İrfân" },
+            { text: "Evlenin çünkü ben diğer ümmetlere karşı sizin çokluğunuzla iftihar edeceğim.", source: "" },
+            { text: "Yetimi himâye eden cennette şöylece benimle beraberdir.", source: "" },
+            { text: "Helâlinden kazanmak hak yolunda yapılan muhârebe kadar ecirlidir.", source: "" },
+            { text: "Mü’minin en fazîletlisi, ahlâkı en güzel olanıdır.", source: "" },
+            { text: "İlmi kitâbetle; yani yazarak bağlayın.", source: "" },
+            { text: "Kim bir hayra delâlet ederse onu işleyen gibi ecir alır.", source: "" },
+            { text: "Deveni bağla, ondan sonra Allah’a tevekkül et.", source: "" },
+            { text: "Ben güzel ahlâkı tamamlamak üzere peygamber ba’s olundum (gönderildim).", source: "" },
+            { text: "Zenginlik arâzî ve mal çokluğundan ibâret değildir. Asıl zenginlik kalp zenginliği yani kanaattir.", source: "" },
+            { text: "İşlerin hayırlısı ortalarıdır. Yani ifrat ve tefritten âzâde (aşırılıktan uzak), mu’tedil (orta) olandır.", source: "" },
+            { text: "Canın her istediğini yemek de israf cümlesindendir.", source: "" },
+            { text: "Ömrü uzun ve ameli hareketi, işi ve ibâdeti güzel olan kimseye ne mutlu!", source: "" },
+            { text: "Amellerin Allah’a en sevgilisi, az da olsa devamlı olanıdır.", source: "" },
+            { text: "Sizden herhangi biriniz Cumâ namazına gideceği zaman gusletsin.", source: "" },
+            { text: "Kabir azâbının çoğu idrardan temizlenmeye ehemmiyet vermemektendir.", source: "" },
+            { text: "Dişleri misvak ile temizlemek ölümden başka bütün hastalıkların mühim bir kısmına şifâdır.", source: "" },
+            { text: "Temizliğe itinâ ve devamlılık, insanı tam bir îmâna da’vet eder.", source: "" },
+            { text: "Sizden birisi abdestli bulunmak niyetiyle abdest alırsa, abdesti bozulmadıkça namazda bulunmuş gibi ecir alır.", source: "" },
+            { text: "Namazda safları iyi doğrultunuz, yani bir hizâda ve muntazam tutunuz.", source: "" },
+            { text: "Sizden biriniz mescide girdiği zaman iki rek’at namaz kılmadıkça oturmasın.", source: "" },
+            { text: "Mü’minin öldükten sonra verilmesine sebeb olduğu ilk hediyesi, cenâze namazını kılan kimsenin Allah katından mağfiret dilemesidir.", source: "" },
+            { text: "Her şeyin bir zekâtı vardır. Cesedin zekâtı da oruçtur.", source: "" },
+            { text: "Kim ramazanın son on gününde itikâf ederse iki hac ve iki umre sevabı alır.", source: "" },
+            { text: "Malının zekâtını ödediğin zaman artık üzerinde olan borcunu yerine getirmiş olursun.", source: "" },
+            { text: "Sadaka vereceğin zaman geciktirme.", source: "" },
+            { text: "Sadakaların en fazîletlisi su içirmek ve su hayrı yapmaktır.", source: "" },
+            { text: "Allah’ın elçisi üçtür: 1. Gazâ eden (Düşmanla savaşan) 2. Hacceden 3. Umre yapan", source: "" },
+            { text: "Cennet gâzîlerin kullandığı kılıçların gölgesi altındadır.", source: "" },
+            { text: "Mü’minlerin amellerinin en fazîletlisi Allah yolunda savaşmaktır.", source: "" },
+            { text: "Harb bir hud’adır (hiledir).", source: "" }
         ];
 
         function setHadis() {
             const index = Math.floor(Math.random() * hadisler.length);
-            document.getElementById('hadisText').innerText = `“${hadisler[index].text}”`;
-            document.getElementById('hadisSource').innerText = `(${hadisler[index].source})`;
+            const h = hadisler[index];
+            document.getElementById('hadisText').innerText = `“${h.text}”`;
+            document.getElementById('hadisSource').innerText = h.source ? `(${h.source})` : "";
         }
 
         setHadis();
@@ -497,6 +532,32 @@
 
         setInterval(calculate, 1000);
         calculate();
+
+        // Sağ tık engelleme
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // Klavye kısayollarını engelleme (F12, Ctrl+Shift+I, Ctrl+U)
+        document.addEventListener('keydown', (e) => {
+            if (
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.key === 'u') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C')
+            ) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Görsellerin sürüklenmesini engelleme
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.nodeName === 'IMG') {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 
