@@ -21,16 +21,19 @@
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
-            user-select: none; /* Metin seçimini engeller */
+            user-select: none;
+            /* Metin seçimini engeller */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
+            scrollbar-gutter: stable;
+            /* Kaydırma çubuğu kaynaklı yatay kaymaları önler */
         }
 
         .container {
             width: 100%;
             min-height: 100vh;
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(2, 6, 23, 0.7) 100%), url('bg.jpeg') no-repeat center center;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(14, 24, 66, 0.7) 100%), url('bg.jpeg') no-repeat 20% 75%;
             background-size: cover;
             display: flex;
             flex-direction: column;
@@ -56,6 +59,8 @@
             letter-spacing: 2px;
             color: var(--gold);
             margin-bottom: 2px;
+            font-variant-numeric: tabular-nums;
+            /* Rakam genişliklerini sabitler */
         }
 
         #fullDate {
@@ -116,7 +121,8 @@
             font-weight: bold;
             color: var(--gold);
             text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
-            transition: all 0.3s ease;
+            font-variant-numeric: tabular-nums;
+            /* Rakam genişliklerini sabitler */
         }
 
         .timer-item div:last-child {
@@ -167,23 +173,31 @@
             height: 100%;
             width: 0%;
             background: #22c55e;
-            /* Yeşil (Tamamlanan) */
             transition: width 1s linear;
             box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.1rem;
-            /* Daha okunaklı olması için artırıldı */
             font-weight: bold;
             color: white;
             white-space: nowrap;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
         }
 
         /* Sahur Modu - Gece Teması */
         .sahur-mode .container {
-            background: linear-gradient(180deg, #1e1b4b 0%, #020617 100%);
+            background: linear-gradient(180deg, rgba(30, 27, 75, 0.7) 0%, rgba(2, 6, 23, 0.9) 100%), url('bg.jpeg') no-repeat 20% 75%;
+            background-size: cover;
             border-color: #312e81;
         }
 
@@ -192,6 +206,24 @@
             text-shadow: 0 0 15px rgba(129, 140, 248, 0.4);
         }
 
+        /* Bayram Namazı Kutusu */
+        #bayramNamazContainer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        #bayramNamazTime {
+            color: white;
+            font-size: 1.4rem;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            margin-left: 5px;
+        }
+
+        /* İftar Time Display */
         #iftarTimeDisplay {
             transition: color 0.5s ease, text-shadow 0.5s ease;
         }
@@ -225,9 +257,20 @@
             margin: 0 0 20px 0;
             border-radius: 0 15px 15px 0;
             text-align: center;
-            max-width: 90%;
+            width: 400px;
+            /* Sabit 400px ile her halükarda genişlik zorlanır */
+            max-width: 100%;
+            /* Mobilde taşmasın */
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             font-style: italic;
-            animation: fadeIn 1s ease-in-out;
+            overflow-y: auto;
+            box-sizing: border-box;
+            /* Genişlik hesaplamasını sabitler */
+            scrollbar-width: thin;
+            /* Daha kibar bir kaydırma çubuğu */
         }
 
         .hadis-text {
@@ -301,6 +344,11 @@
 
             <div class="progress-container">
                 <div id="progressBar" class="progress-bar"></div>
+                <div id="progressText" class="progress-text"></div>
+            </div>
+
+            <div id="bayramNamazContainer">
+                Bayram Namazı Saati: <strong id="bayramNamazTime">--:--</strong>
             </div>
         </div>
 
@@ -317,6 +365,16 @@
     </div>
 
     <script>
+        // Bayram Namazı Vakitleri
+        const bayramNamazVakitleri = {
+            istanbul: "07:39",
+            ankara: "07:23",
+            izmir: "07:45",
+            bursa: "07:38",
+            kastamonu: "07:20",
+            londra: "06:53"
+        };
+
         // 2026 Mart ayı (Ramazan) için örnek vakitler
         const vakitler = {
             istanbul: [
@@ -454,6 +512,8 @@
             const yarinVakit = vakitler[city][index + 1] || bugunVakit;
             const dunVakit = vakitler[city][index - 1] || bugunVakit;
 
+            document.getElementById('bayramNamazTime').innerText = bayramNamazVakitleri[city] || "--:--";
+
             document.getElementById('liveClock').innerText = now.toLocaleTimeString('tr-TR');
 
             // Tarih ve Gün Formatlama
@@ -521,6 +581,7 @@
             let percent = (elapsed / totalDuration) * 100;
             percent = Math.max(0, Math.min(100, percent));
             const bar = document.getElementById('progressBar');
+            const text = document.getElementById('progressText');
             bar.style.width = percent + "%";
 
             const diff = target - now;
@@ -528,12 +589,7 @@
             const m = Math.floor((diff / (1000 * 60)) % 60);
             const s = Math.floor((diff / 1000) % 60);
 
-            // Eğer bar çok darsa yazı yazma
-            if (percent > 15) {
-                bar.innerText = `${h} Saat ${m} Dakika kaldı`;
-            } else {
-                bar.innerText = "";
-            }
+            text.innerText = `${h} Saat ${m} Dakika kaldı`;
 
             document.getElementById('h').innerText = h.toString().padStart(2, '0');
             document.getElementById('m').innerText = m.toString().padStart(2, '0');
