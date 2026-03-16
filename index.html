@@ -33,7 +33,7 @@
         .container {
             width: 100%;
             min-height: 100vh;
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(14, 24, 66, 0.7) 100%), url('bg.jpeg') no-repeat 20% 75%;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(14, 24, 66, 0.7) 100%), url('bg.webp') no-repeat 20% 75%;
             background-size: cover;
             display: flex;
             flex-direction: column;
@@ -46,7 +46,7 @@
         @media (min-width: 450px) {
             .container {
                 max-width: 430px;
-                min-height: 850px;
+                min-height: 808px;
                 border: 1px solid #1e293b;
                 border-radius: 30px;
                 margin: 20px;
@@ -196,7 +196,7 @@
 
         /* Sahur Modu - Gece Teması */
         .sahur-mode .container {
-            background: linear-gradient(180deg, rgba(30, 27, 75, 0.7) 0%, rgba(2, 6, 23, 0.9) 100%), url('bg.jpeg') no-repeat 20% 75%;
+            background: linear-gradient(180deg, rgba(30, 27, 75, 0.7) 0%, rgba(2, 6, 23, 0.9) 100%), url('bg.webp') no-repeat 20% 75%;
             background-size: cover;
             border-color: #312e81;
         }
@@ -306,7 +306,7 @@
         <div id="liveClock">00:00:00</div>
         <div id="fullDate">-- Mart 2026, Cuma</div>
 
-        <select id="citySelect" onchange="calculate()">
+        <select id="citySelect" onchange="changeCity()">
             <option value="istanbul">İstanbul</option>
             <option value="ankara">Ankara</option>
             <option value="izmir">İzmir</option>
@@ -484,6 +484,18 @@
         }
 
         setHadis();
+
+        // Kayıtlı şehri yükle
+        const savedCity = localStorage.getItem('selectedCity');
+        if (savedCity) {
+            document.getElementById('citySelect').value = savedCity;
+        }
+
+        // Şehir değiştiğinde kaydet
+        function changeCity() {
+            localStorage.setItem('selectedCity', document.getElementById('citySelect').value);
+            calculate();
+        }
 
         function calculate() {
             const now = new Date();
