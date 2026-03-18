@@ -511,8 +511,8 @@
             const year = now.getFullYear();
             const city = document.getElementById('citySelect').value;
 
-            // Bayram Kontrolü (20 Mart 2026 ve sonrası)
-            if (year === 2026 && month === 2 && dayOfMonth >= 20) {
+            // Bayram Kontrolü (20-22 Mart 2026)
+            if (year === 2026 && month === 2 && dayOfMonth >= 20 && dayOfMonth <= 22) {
                 document.getElementById('mainContent').style.display = 'none';
                 document.getElementById('citySelect').style.display = 'none';
                 document.getElementById('bayramMessage').style.display = 'block';
@@ -522,6 +522,38 @@
                 if (document.getElementById('mainContent')) document.getElementById('mainContent').style.display = 'block';
                 if (document.getElementById('citySelect')) document.getElementById('citySelect').style.display = 'inline-block';
                 if (document.getElementById('bayramMessage')) document.getElementById('bayramMessage').style.display = 'none';
+            }
+
+            // 2027 Ramazan Sayaç Kontrolü (23 Mart 2026'dan İtibaren)
+            const nextRamadan = new Date('2027-02-08T00:00:00');
+            if (now >= new Date('2026-03-23T00:00:00') && now < nextRamadan) {
+                const diff = nextRamadan - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('dateLabel').innerText = "Gelecek Ramazan";
+                const vakitLabel = document.getElementById('vakitLabel');
+                if (vakitLabel) {
+                    vakitLabel.innerText = "RAMAZAN AYINA";
+                    vakitLabel.style.opacity = "1";
+                }
+                document.getElementById('iftarTimeDisplay').innerText = `${days} Gün Var`;
+                
+                document.getElementById('h').innerText = h.toString().padStart(2, '0');
+                document.getElementById('m').innerText = m.toString().padStart(2, '0');
+                document.getElementById('s').innerText = s.toString().padStart(2, '0');
+
+                // İlerleme çubuğunu gizle (uzun süreli sayaç için)
+                const progressContainer = document.querySelector('.progress-container');
+                if (progressContainer) progressContainer.style.display = 'none';
+                
+                const timerGrid = document.querySelector('.timer-grid');
+                if (timerGrid) timerGrid.style.display = 'grid';
+
+                document.body.classList.remove('sahur-mode');
+                return; 
             }
 
             let index = dayOfMonth - 1;
@@ -587,11 +619,34 @@
                 document.getElementById('vakitLabel').innerText = "İMSAK VAKTİ (SAHUR)";
                 document.getElementById('iftarTimeDisplay').innerText = yarinVakit.im;
             }
-
             if (isSahur) {
                 document.body.classList.add('sahur-mode');
             } else {
                 document.body.classList.remove('sahur-mode');
+            }
+
+            // Bayram Arifesi Akşamı Kontrolü (19 Mart İftardan Sonra)
+            const vakitLabel = document.getElementById('vakitLabel');
+            if (year === 2026 && month === 2 && dayOfMonth === 19 && now >= iftarTarget) {
+                document.getElementById('dateLabel').innerText = "Ramazan Bayramınız";
+                if (vakitLabel) {
+                    vakitLabel.innerText = "Mübarek olsun";
+                    vakitLabel.style.opacity = "1";
+                }
+                document.getElementById('iftarTimeDisplay').innerText = "İyi Bayramlar";
+
+                const timerGrid = document.querySelector('.timer-grid');
+                const progressContainer = document.querySelector('.progress-container');
+                if (timerGrid) timerGrid.style.display = 'none';
+                if (progressContainer) progressContainer.style.display = 'none';
+
+                document.body.classList.remove('sahur-mode');
+            } else {
+                if (vakitLabel) vakitLabel.style.opacity = "0.6";
+                const timerGrid = document.querySelector('.timer-grid');
+                const progressContainer = document.querySelector('.progress-container');
+                if (timerGrid) timerGrid.style.display = 'grid';
+                if (progressContainer) progressContainer.style.display = 'block';
             }
 
             // İlerleme hesaplama
