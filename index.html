@@ -360,6 +360,8 @@
         </div>
 
         <div id="bayramMessage">
+            <div id="bayramClock" style="font-size:2rem; font-weight:bold; letter-spacing:2px; color:var(--gold); margin-bottom:2px; font-variant-numeric:tabular-nums;">00:00:00</div>
+            <div id="bayramDate" style="font-size:0.9rem; opacity:0.7; margin-bottom:20px; text-transform:uppercase; letter-spacing:1px;">-- Mart 2026, Cuma</div>
             <h2>Hayırlı Bayramlar</h2>
             <p>Ramazan Bayramınız Mübarek Olsun!</p>
         </div>
@@ -525,6 +527,9 @@
                 document.getElementById('mainContent').style.display = 'none';
                 document.getElementById('citySelect').style.display = 'none';
                 document.getElementById('bayramMessage').style.display = 'block';
+                document.getElementById('bayramClock').innerText = now.toLocaleTimeString('tr-TR');
+                const bayramOpts = { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' };
+                document.getElementById('bayramDate').innerText = now.toLocaleDateString('tr-TR', bayramOpts);
                 document.body.classList.remove('sahur-mode');
                 return;
             } else {
