@@ -511,6 +511,15 @@
             const year = now.getFullYear();
             const city = document.getElementById('citySelect').value;
 
+            // Saat ve Tarihleri Güncelle (Tüm görünümlerde aktif kalsın)
+            document.getElementById('liveClock').innerText = now.toLocaleTimeString('tr-TR');
+
+            const options = { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' };
+            document.getElementById('fullDate').innerText = now.toLocaleDateString('tr-TR', options);
+
+            const monthYearOptions = { month: 'long', year: 'numeric' };
+            document.getElementById('currentDateDisplay').innerText = dayOfMonth + " " + now.toLocaleDateString('tr-TR', monthYearOptions);
+
             // Bayram Kontrolü (20-22 Mart 2026)
             if (year === 2026 && month === 2 && dayOfMonth >= 20 && dayOfMonth <= 22) {
                 document.getElementById('mainContent').style.display = 'none';
@@ -565,13 +574,7 @@
 
             document.getElementById('bayramNamazTime').innerText = bayramNamazVakitleri[city] || "--:--";
 
-            document.getElementById('liveClock').innerText = now.toLocaleTimeString('tr-TR');
 
-            // Tarih ve Gün Formatlama
-            const options = { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' };
-            document.getElementById('fullDate').innerText = now.toLocaleDateString('tr-TR', options);
-
-            document.getElementById('currentDateDisplay').innerText = dayOfMonth + " Mart 2026";
 
             const imsakTarget = new Date(now);
             const [imH, imM] = bugunVakit.im.split(':');
